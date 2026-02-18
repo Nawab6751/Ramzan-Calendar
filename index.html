@@ -8,52 +8,34 @@
         :root { --gold: #D4AF37; --green: #064E3B; }
         body { background: var(--green); color: white; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 0; padding-bottom: 50px; }
         .banner { background: var(--gold); color: var(--green); padding: 15px; font-size: 1.2em; font-weight: bold; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
-        
-        /* Dua Section */
-        .dua-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 15px; }
-        .dua-card { background: rgba(0,0,0,0.3); border: 1px solid var(--gold); padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .arabic { font-size: 1.5em; color: var(--gold); margin-bottom: 10px; font-family: 'Times New Roman', serif; }
-        .translation { font-size: 0.9em; font-style: italic; color: #ddd; line-height: 1.4; }
-
+        .dua-card { background: rgba(0,0,0,0.3); border: 1px solid var(--gold); padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; margin: 10px auto; }
+        .arabic { font-size: 1.4em; color: var(--gold); margin-bottom: 5px; }
         input { padding: 12px; width: 70%; border-radius: 25px; border: 2px solid var(--gold); background: #053a2d; color: white; outline: none; margin-top: 20px; }
         button { padding: 10px 20px; border-radius: 25px; border: none; background: var(--gold); color: var(--green); font-weight: bold; margin-top: 10px; cursor: pointer; }
-        
-        .city-title { color: var(--gold); font-size: 1.5em; margin: 20px 0; text-transform: uppercase; border-bottom: 2px solid var(--gold); display: inline-block; padding-bottom: 5px; }
-        
         .table-container { overflow-x: auto; padding: 0 15px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9em; }
-        th { background: var(--gold); color: var(--green); padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+        table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.3); font-size: 0.85em; }
+        th { background: var(--gold); color: var(--green); padding: 8px; }
+        td { padding: 8px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
         .highlight { color: var(--gold); font-weight: bold; }
-
         .footer { margin-top: 30px; font-size: 0.8em; opacity: 0.7; }
-        .footer b { color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div class="banner">Calendar For Ramzan Mubarak 2026</div>
 
-    <div class="dua-container">
-        <div class="dua-card">
-            <h3 style="color: var(--gold);">سحری کی دعا</h3>
-            <div class="arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
-            <div class="translation">Aur maine kal ke Ramzan ke roze ki niyat ki.</div>
-        </div>
-        <div class="dua-card">
-            <h3 style="color: var(--gold);">افطاری کی دعا</h3>
-            <div class="arabic">اللَّهُمَّ اِنِّی لَکَ صُمْتُ وَبِکَ اٰمَنْتُ وَعَلَیْکَ تَوَکَّلْتُ وَعَلٰی رِزْقِکَ اَفْطَرْتُ</div>
-            <div class="translation">O Allah! I fasted for You and I believe in You and I put my trust in You and I break my fast with Your sustenance.</div>
-        </div>
+    <div class="dua-card">
+        <div class="arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
+        <div style="font-size: 0.8em;">I fast tomorrow for the month of Ramadan</div>
     </div>
 
     <div class="search-box">
-        <input type="text" id="cityInput" placeholder="Enter City (e.g. Faisalabad)">
+        <input type="text" id="cityInput" placeholder="Enter City (e.g. Dera Ghazi Khan)">
         <br>
-        <button onclick="getFullMonthCalendar()">Show 30 Days Calendar</button>
+        <button onclick="getCorrectCalendar()">Generate Accurate Calendar</button>
     </div>
 
-    <div id="cityName" class="city-title">Search Your City</div>
+    <h2 id="cityName" style="color:var(--gold); margin-top:20px;"></h2>
 
     <div class="table-container">
         <table>
@@ -66,7 +48,7 @@
                 </tr>
             </thead>
             <tbody id="calendarBody">
-                <tr><td colspan="4">Please search a city to see the full month timetable.</td></tr>
+                <tr><td colspan="4">Enter city to fix dates starting from Feb 19.</td></tr>
             </tbody>
         </table>
     </div>
@@ -74,36 +56,54 @@
     <div class="footer">DEVELOPER: <b>NAWAB ZADA</b></div>
 
     <script>
-        async function getFullMonthCalendar() {
+        async function getCorrectCalendar() {
             const city = document.getElementById('cityInput').value || "Karachi";
             const tableBody = document.getElementById('calendarBody');
-            tableBody.innerHTML = "<tr><td colspan='4'>Loading Full Calendar...</td></tr>";
+            tableBody.innerHTML = "<tr><td colspan='4'>Updating to Feb 19 Start...</td></tr>";
 
             try {
-                // Aladhan API - Adjusting for Ramzan 2026 (Starts approx March 1)
-                const res = await fetch(`https://api.aladhan.com/v1/calendarByCity/2026/3?city=${city}&country=Pakistan&method=1`);
-                const data = await res.json();
-                
-                document.getElementById('cityName').innerText = city;
-                tableBody.innerHTML = ""; 
+                // Fetching for February and March to combine
+                const resFeb = await fetch(`https://api.aladhan.com/v1/calendarByCity/2026/2?city=${city}&country=Pakistan&method=1`);
+                const resMar = await fetch(`https://api.aladhan.com/v1/calendarByCity/2026/3?city=${city}&country=Pakistan&method=1`);
+                const dataFeb = await resFeb.json();
+                const dataMar = await resMar.json();
 
-                data.data.forEach((day, index) => {
-                    const row = `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${day.date.readable}</td>
-                            <td class="highlight">${day.timings.Fajr.split(' ')[0]}</td>
-                            <td class="highlight">${day.timings.Maghrib.split(' ')[0]}</td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
+                document.getElementById('cityName').innerText = city.toUpperCase();
+                tableBody.innerHTML = "";
+
+                let rozaCount = 1;
+
+                // 1. Feb 19 se end tak check karo
+                dataFeb.data.forEach(day => {
+                    if (parseInt(day.date.gregorian.day) >= 19) {
+                        addRow(rozaCount++, day);
+                    }
                 });
+
+                // 2. March ke pehle 20 din (approx) add karo
+                dataMar.data.forEach(day => {
+                    if (rozaCount <= 30) {
+                        addRow(rozaCount++, day);
+                    }
+                });
+
             } catch (err) {
-                alert("Error: City not found! Please check spelling.");
-                tableBody.innerHTML = "<tr><td colspan='4'>Error fetching data.</td></tr>";
+                alert("City not found!");
             }
+        }
+
+        function addRow(roza, day) {
+            const tableBody = document.getElementById('calendarBody');
+            const row = `
+                <tr>
+                    <td>${roza}</td>
+                    <td>${day.date.readable}</td>
+                    <td class="highlight">${day.timings.Fajr.split(' ')[0]}</td>
+                    <td class="highlight">${day.timings.Maghrib.split(' ')[0]}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
         }
     </script>
 </body>
-    </html>
-    
+</html>
