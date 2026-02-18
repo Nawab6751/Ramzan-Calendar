@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAWAB RAMZAN 2026 | Accurate Times</title>
+    <style>
+        :root { --gold: #D4AF37; --green: #064E3B; }
+        body { background: var(--green); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; border: 2px solid var(--gold); padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.3); }
+        h1 { color: var(--gold); text-shadow: 2px 2px 4px #000; }
+        .time-box { display: flex; justify-content: space-around; margin: 20px 0; }
+        .card { background: #053a2d; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--gold); min-width: 120px; }
+        .time { font-size: 1.8em; font-weight: bold; color: var(--gold); }
+        .location { font-style: italic; margin-bottom: 10px; color: #ccc; }
+        .status { background: var(--gold); color: black; padding: 5px 10px; border-radius: 20px; font-weight: bold; margin-top: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌙 NAWAB RAMZAN</h1>
+        <div id="city" class="location">Detecting Your City...</div>
+        
+        <div class="time-box">
+            <div class="card">
+                <div>سحری (Sehri)</div>
+                <div id="sehri" class="time">--:--</div>
+            </div>
+            <div class="card">
+                <div>افطاری (Iftar)</div>
+                <div id="iftar" class="time">--:--</div>
+            </div>
+        </div>
+
+        <div id="countdown" class="status">Next: Fetching...</div>
+        
+        <hr style="border: 0.5px solid #D4AF37; margin: 20px 0;">
+        <div id="date" style="font-size: 1.1em;">Hijri Date Loading...</div>
+    </div>
+
+    <script>
+        async function getTimes() {
+            // User ki IP se location nikalna for 100% accuracy
+            try {
+                const locRes = await fetch('https://ipapi.co/json/');
+                const locData = await locRes.json();
+                const { city, country_name } = locData;
+                document.getElementById('city').innerText = `${city}, ${country_name}`;
+
+                // Aladhan API for precise prayer times
+                const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country_name}&method=1`);
+                const data = await response.json();
+                const t = data.data.timings;
+
+                document.getElementById('sehri').innerText = t.Fajr;
+                document.getElementById('iftar').innerText = t.Maghrib;
+                document.getElementById('date').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.en} ${data.data.date.hijri.year} AH`;
+                document.getElementById('countdown').innerText = "Live & Accurate";
+
+            } catch (error) {
+                document.getElementById('city').innerText = "Error: Please allow location access";
+            }
+        }
+        getTimes();
+    </script>
+</body>
+</html>
