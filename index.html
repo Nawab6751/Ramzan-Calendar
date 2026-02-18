@@ -3,90 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar For Ramzan Mubarak 2026</title>
+    <title>Ramzan Calendar 2026</title>
     <style>
         :root { --gold: #D4AF37; --green: #064E3B; --white: #ffffff; }
-        body { background: var(--green); color: var(--white); font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 0; padding: 10px; }
+        body { background: var(--green); color: var(--white); font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 0; padding: 0; }
         
-        /* Top Banner */
-        .banner { background: var(--gold); color: var(--green); padding: 15px; font-size: 1.4em; font-weight: bold; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 30px; }
+        .banner { background: var(--gold); color: var(--green); padding: 15px; font-size: 1.3em; font-weight: bold; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 20px; }
         
-        .container { max-width: 450px; margin: auto; border: 1px solid var(--gold); padding: 25px; border-radius: 20px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
+        .search-section { margin-bottom: 25px; padding: 0 20px; }
+        input { padding: 12px; width: 80%; max-width: 300px; border-radius: 25px; border: 2px solid var(--gold); background: #053a2d; color: white; text-align: center; font-size: 1em; outline: none; }
+        button { padding: 10px 20px; border-radius: 25px; border: none; background: var(--gold); color: var(--green); font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        .container { max-width: 450px; margin: auto; border: 1px solid var(--gold); padding: 25px; border-radius: 20px; background: rgba(0,0,0,0.3); }
         
-        .city-tag { font-size: 1.3em; color: var(--gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .city-tag { font-size: 1.4em; color: var(--gold); font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
         
-        .time-box { display: flex; justify-content: space-around; margin: 25px 0; }
-        .card { background: #053a2d; padding: 20px; border-radius: 15px; border-bottom: 4px solid var(--gold); min-width: 130px; transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
+        .time-box { display: flex; justify-content: space-around; margin: 20px 0; }
+        .card { background: #053a2d; padding: 15px; border-radius: 15px; border-bottom: 4px solid var(--gold); min-width: 130px; }
+        .time-value { font-size: 1.8em; font-weight: bold; color: var(--gold); }
         
-        .time-label { font-size: 1.1em; margin-bottom: 10px; color: #ccc; }
-        .time-value { font-size: 2em; font-weight: bold; color: var(--gold); }
-        
-        .date-info { margin-top: 20px; font-size: 1em; opacity: 0.9; }
-        
-        /* Developer Footer */
-        .footer { margin-top: 40px; font-size: 0.9em; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
-        .footer b { color: var(--gold); text-transform: uppercase; }
+        .footer { margin-top: 40px; padding-bottom: 20px; font-size: 0.8em; color: rgba(255,255,255,0.6); }
+        .footer b { color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="banner">
-        Calendar For Ramzan Mubarak 2026
+    <div class="banner">Calendar For Ramzan Mubarak 2026</div>
+
+    <div class="search-section">
+        <input type="text" id="cityInput" placeholder="Enter City (e.g. Lahore)">
+        <br>
+        <button onclick="updateBySearch()">Search Time</button>
     </div>
 
     <div class="container">
-        <div id="city" class="city-tag">Loading Location...</div>
-        <div id="country" style="font-size: 0.8em; margin-top: 5px;">Checking Region...</div>
+        <div id="cityName" class="city-tag">Your City</div>
         
         <div class="time-box">
             <div class="card">
-                <div class="time-label">سحری (Sehri)</div>
+                <div style="margin-bottom:10px;">سحری (Sehri)</div>
                 <div id="sehri" class="time-value">--:--</div>
             </div>
             <div class="card">
-                <div class="time-label">افطاری (Iftar)</div>
+                <div style="margin-bottom:10px;">افطاری (Iftar)</div>
                 <div id="iftar" class="time-value">--:--</div>
             </div>
         </div>
-
-        <div id="date" class="date-info">Ramzan Mubarak 🌙</div>
+        <div id="date">Ramzan 2026 🌙</div>
     </div>
 
-    <div class="footer">
-        DEVELOPER: <b>Nawab ZADA</b>
-    </div>
+    <div class="footer">DEVELOPER: <b>NAWAB ZADA</b></div>
 
     <script>
-        async function getRamzanData() {
+        // Default Load with IP Location
+        async function init() {
             try {
-                // Precise IP-based location
                 const locRes = await fetch('https://ipapi.co/json/');
                 const locData = await locRes.json();
-                const city = locData.city || "Karachi";
-                const country = locData.country_name || "Pakistan";
+                fetchTimes(locData.city || "Karachi", locData.country_name || "Pakistan");
+            } catch { fetchTimes("Karachi", "Pakistan"); }
+        }
 
-                document.getElementById('city').innerText = city;
-                document.getElementById('country').innerText = country;
-
-                // Aladhan API - Method 1 (University of Islamic Sciences, Karachi)
+        async function fetchTimes(city, country) {
+            try {
                 const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=1`);
                 const data = await res.json();
                 const t = data.data.timings;
-
-                // Updating UI
+                
+                document.getElementById('cityName').innerText = city;
                 document.getElementById('sehri').innerText = t.Fajr;
                 document.getElementById('iftar').innerText = t.Maghrib;
-                
-                const hijri = data.data.date.hijri;
-                document.getElementById('date').innerText = `${hijri.day} ${hijri.month.en} ${hijri.year} AH`;
-
-            } catch (err) {
-                document.getElementById('city').innerText = "Update Connection";
-                console.error(err);
-            }
+                document.getElementById('date').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.en} ${data.data.date.hijri.year} AH`;
+            } catch (err) { alert("City not found. Please check spelling."); }
         }
-        getRamzanData();
+
+        function updateBySearch() {
+            const city = document.getElementById('cityInput').value;
+            if(city) fetchTimes(city, "");
+        }
+
+        init();
     </script>
 </body>
 </html>
