@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramzan Calendar 2026 - Nawab Zada</title>
+    <title>Accurate Ramzan Calendar 2026</title>
     <style>
         :root { --gold: #D4AF37; --green: #064E3B; }
-        body { background: var(--green); color: white; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 0; padding-bottom: 50px; }
+        body { background: var(--green); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding-bottom: 50px; }
         .banner { background: var(--gold); color: var(--green); padding: 15px; font-size: 1.2em; font-weight: bold; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
-        
-        /* Dua Section */
         .dua-card { background: rgba(0,0,0,0.3); border: 1px solid var(--gold); padding: 15px; border-radius: 15px; width: 90%; max-width: 450px; margin: 10px auto; }
-        .arabic { font-size: 1.3em; color: var(--gold); margin-bottom: 5px; font-weight: bold; line-height: 1.6; }
-        .trans { font-size: 0.85em; color: #ccc; font-style: italic; }
-
-        input { padding: 12px; width: 70%; border-radius: 25px; border: 2px solid var(--gold); background: #053a2d; color: white; outline: none; margin-top: 20px; }
+        .arabic { font-size: 1.4em; color: var(--gold); font-weight: bold; }
+        input { padding: 12px; width: 70%; border-radius: 25px; border: 2px solid var(--gold); background: #053a2d; color: white; margin-top: 20px; outline: none; }
         button { padding: 10px 25px; border-radius: 25px; border: none; background: var(--gold); color: var(--green); font-weight: bold; margin-top: 10px; cursor: pointer; }
-        
         .table-container { overflow-x: auto; padding: 0 15px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.3); font-size: 0.9em; }
-        th { background: var(--gold); color: var(--green); padding: 10px; }
+        table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.4); font-size: 0.9em; }
+        th { background: var(--gold); color: var(--green); padding: 12px; }
         td { padding: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-        .highlight { color: var(--gold); font-weight: bold; }
+        .highlight { color: var(--gold); font-weight: bold; font-size: 1.1em; }
         .footer { margin-top: 30px; font-size: 0.8em; opacity: 0.8; }
     </style>
 </head>
@@ -32,22 +27,20 @@
     <div class="dua-card">
         <h3 style="color:var(--gold); margin:0;">سحری کی دعا</h3>
         <div class="arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
-        <div class="trans">I intend to keep the fast tomorrow for the month of Ramadan.</div>
     </div>
 
     <div class="dua-card">
         <h3 style="color:var(--gold); margin:0;">افطاری کی دعا</h3>
         <div class="arabic">اللَّهُمَّ اِنِّی لَکَ صُمْتُ وَبِکَ اٰمَنْتُ وَعَلَیْکَ تَوَکَّلْتُ وَعَلٰی رِزْقِکَ اَفْطَرْتُ</div>
-        <div class="trans">O Allah! I fasted for You and I believe in You and I break my fast with Your sustenance.</div>
     </div>
 
     <div class="search-box">
-        <input type="text" id="cityInput" placeholder="Enter City (e.g. Dera Ghazi Khan)">
+        <input type="text" id="cityInput" placeholder="Enter City (e.g. Lahore, Multan)">
         <br>
-        <button onclick="generateCorrectCalendar()">Generate Full Calendar</button>
+        <button onclick="generateAccurateCalendar()">Generate Fixed Calendar</button>
     </div>
 
-    <h2 id="cityName" style="color:var(--gold); margin-top:20px; text-transform: uppercase;"></h2>
+    <h2 id="cityName" style="color:var(--gold); margin-top:20px;"></h2>
 
     <div class="table-container">
         <table>
@@ -55,12 +48,12 @@
                 <tr>
                     <th>Roza</th>
                     <th>Date</th>
-                    <th>Sehri</th>
-                    <th>Iftar</th>
+                    <th>Sehri (Fajr)</th>
+                    <th>Iftar (Maghrib)</th>
                 </tr>
             </thead>
             <tbody id="calendarBody">
-                <tr><td colspan="4">Enter city to load calendar starting 19 Feb.</td></tr>
+                <tr><td colspan="4">Enter city for 100% accurate timing.</td></tr>
             </tbody>
         </table>
     </div>
@@ -68,31 +61,31 @@
     <div class="footer">DEVELOPER: <b>NAWAB ZADA</b></div>
 
     <script>
-        async function generateCorrectCalendar() {
+        async function generateAccurateCalendar() {
             const city = document.getElementById('cityInput').value || "Karachi";
             const tableBody = document.getElementById('calendarBody');
-            tableBody.innerHTML = "<tr><td colspan='4'>Loading Accurate Data...</td></tr>";
+            tableBody.innerHTML = "<tr><td colspan='4'>Calculating accurate timings...</td></tr>";
 
             try {
-                // Fetching Feb and Mar to start from 19th Feb
+                // Method 1 = University of Islamic Sciences, Karachi (Best for Pakistan)
                 const resFeb = await fetch(`https://api.aladhan.com/v1/calendarByCity/2026/2?city=${city}&country=Pakistan&method=1`);
                 const resMar = await fetch(`https://api.aladhan.com/v1/calendarByCity/2026/3?city=${city}&country=Pakistan&method=1`);
                 
                 const dataFeb = await resFeb.json();
                 const dataMar = await resMar.json();
 
-                document.getElementById('cityName').innerText = city;
+                document.getElementById('cityName').innerText = city.toUpperCase();
                 tableBody.innerHTML = "";
                 let roza = 1;
 
-                // February Data (Start from 19th)
+                // February Logic
                 dataFeb.data.forEach(day => {
                     if (parseInt(day.date.gregorian.day) >= 19) {
                         renderRow(roza++, day);
                     }
                 });
 
-                // March Data (Up to 30 Rozas)
+                // March Logic
                 dataMar.data.forEach(day => {
                     if (roza <= 30) {
                         renderRow(roza++, day);
@@ -100,19 +93,23 @@
                 });
 
             } catch (err) {
-                alert("City not found!");
-                tableBody.innerHTML = "<tr><td colspan='4'>Check city spelling.</td></tr>";
+                alert("City not found! Check spelling.");
+                tableBody.innerHTML = "<tr><td colspan='4'>Error. Please try again.</td></tr>";
             }
         }
 
         function renderRow(roza, day) {
             const tableBody = document.getElementById('calendarBody');
+            // Clean time (removes extra text)
+            let sehri = day.timings.Fajr.split(' ')[0];
+            let iftar = day.timings.Maghrib.split(' ')[0];
+
             tableBody.innerHTML += `
                 <tr>
                     <td>${roza}</td>
                     <td>${day.date.readable}</td>
-                    <td class="highlight">${day.timings.Fajr.split(' ')[0]}</td>
-                    <td class="highlight">${day.timings.Maghrib.split(' ')[0]}</td>
+                    <td class="highlight">${sehri} AM</td>
+                    <td class="highlight">${iftar} PM</td>
                 </tr>
             `;
         }
